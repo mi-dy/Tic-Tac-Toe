@@ -1,9 +1,11 @@
 import random
+import re
 
 from tkinter import *
 from tkinter import ttk
 
 def main():
+    in_a_row = 3
     board = [["","",""],["","",""],["","",""]]
     for _ in range(5):
 
@@ -22,7 +24,8 @@ def main():
             print("Victory royal!")
             return
 
-        enemy_turn(board)
+        enemy_x, enemy_y = enemy_function(board, in_a_row)
+        board[enemy_x][enemy_y] = "O"
 
         if check_victory(board):
             for row in board:
@@ -32,6 +35,7 @@ def main():
             return
 
 
+# Make turn functions work no matter how big is the board
 def turn_to_column(board):
     columns = [[], [], []]
     for row in board:
@@ -67,30 +71,16 @@ def check_victory(board):
 
     return False
 
-def enemy_turn(board):
 
-    for i, row in enumerate(board):
-        if "" in row and row.count("O") == 2:
-            x = 0
-            for element in row:
-                if element == "":
-                    break
-                x += 1
+def enemy_function(board, in_a_row):
+    for symbol in ["O", "X"]:
+        for x, row in enumerate(board):
+            for y in range(len(row)-in_a_row + 1):
+                check = row[y : y + in_a_row]
+                if check.count(symbol) == in_a_row -1 and check.count("") == 1:
+                    empty_index = check.index("")
+                    return x, y + empty_index
 
-            board[i][x] = "O"
-            return board
-
-        if "" in row and row.count("X") == 2:
-            x = 0
-            for element in row:
-                if element == "":
-                    break
-                x += 1
-
-            board[i][x] = "O"
-            return board
-            
-
-   
+                    
 if __name__ == "__main__":
     main()
