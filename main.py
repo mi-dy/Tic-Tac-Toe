@@ -12,10 +12,10 @@ def main():
         for row in board:
             print(f"|{row[0]}|{row[1]}|{row[2]}|")
 
-        x_input = int(input("Place X at row: ")) -1
-        y_input = int(input("Place X at calumn: ")) -1
+        y_input = int(input("Place X at row: ")) -1
+        x_input = int(input("Place X at calumn: ")) -1
         
-        board[x_input][y_input] = "X"
+        board[y_input][x_input] = "X"
 
         if check_victory(board):
             for row in board:
@@ -24,8 +24,8 @@ def main():
             print("Victory royal!")
             return
 
-        enemy_x, enemy_y = enemy_function(board, in_a_row)
-        board[enemy_x][enemy_y] = "O"
+        enemy_y, enemy_x = enemy_function(board, in_a_row)
+        board[enemy_y][enemy_x] = "O"
 
         if check_victory(board):
             for row in board:
@@ -35,9 +35,10 @@ def main():
             return
 
 
-# Make turn functions work no matter how big is the board
 def turn_to_column(board):
-    columns = [[], [], []]
+    columns = []
+    for row in board:
+        columns.append([])
     for row in board:
         for i, symbol in enumerate(row):
             columns[i].append(symbol)
@@ -53,7 +54,7 @@ def turn_to_diagonal(board):
         i -= 1
     return diagonals
 
-
+#Change victory cond check to be viable in bigger scale boards
 def check_victory(board):
 
     for row in board:
@@ -73,14 +74,25 @@ def check_victory(board):
 
 
 def enemy_function(board, in_a_row):
-    for symbol in ["O", "X"]:
-        for x, row in enumerate(board):
-            for y in range(len(row)-in_a_row + 1):
-                check = row[y : y + in_a_row]
-                if check.count(symbol) == in_a_row -1 and check.count("") == 1:
-                    empty_index = check.index("")
-                    return x, y + empty_index
 
-                    
+    for symbol in ["O", "X"]:
+
+        for y in range(len(board)):
+            for x in range(len(board[0])-in_a_row + 1):
+                check_segment = board[y][x : x + in_a_row]
+                if check_segment.count(symbol) == in_a_row -1 and check_segment.count("") >= 1:
+                    empty_square_index = check_segment.index("")
+                    return y, x + empty_square_index
+        
+        for y in range(len(board) - in_a_row + 1):
+            for x in range(len(board[0])):
+                check_segment = []
+                for i in range(in_a_row):
+                    check_segment.append(board[y+i][x])
+                if check_segment.count(symbol) == in_a_row -1 and check_segment.count("") >= 1:
+                    empty_square_index = check_segment.index("")
+                    return y + empty_square_index, x
+
+ 
 if __name__ == "__main__":
     main()
