@@ -74,24 +74,40 @@ def check_victory(board):
 
 
 def enemy_function(board, in_a_row):
-
+    best_moves = []
+    directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
     for symbol in ["O", "X"]:
 
         for y in range(len(board)):
-            for x in range(len(board[0])-in_a_row + 1):
-                check_segment = board[y][x : x + in_a_row]
-                if check_segment.count(symbol) == in_a_row -1 and check_segment.count("") >= 1:
-                    empty_square_index = check_segment.index("")
-                    return y, x + empty_square_index
-        
-        for y in range(len(board) - in_a_row + 1):
             for x in range(len(board[0])):
-                check_segment = []
-                for i in range(in_a_row):
-                    check_segment.append(board[y+i][x])
-                if check_segment.count(symbol) == in_a_row -1 and check_segment.count("") >= 1:
-                    empty_square_index = check_segment.index("")
-                    return y + empty_square_index, x
+                for dy, dx in directions:
+                    end_y = y + (in_a_row - 1) * dy
+                    end_x = x + (in_a_row - 1) * dx
+                    if 0 <= end_y < len(board) and 0 <= end_x < len(board[0]):
+                        segment = [board[y + i*dy][x + i*dx] for i in range(in_a_row)]
+                        if segment.count(symbol) == in_a_row -1 and segment.count("") >= 1:
+                            empty_square_index = segment.index("")
+                            return y + empty_square_index*dy, x + empty_square_index*dx
+                        elif segment.count(symbol) > 0 and segment.count("") > 0 and len(set(segment)) == 2:
+                            symbol_value = 0
+                            if symbol == "O":
+                                symbol_value = 1
+                            empty_square_index = segment.index("")
+                            best_moves.append((segment.count(symbol), symbol_value, y + empty_square_index*dy, x + empty_square_index*dx))
+
+    if len(best_moves) >= 1:
+        best_move = max(best_moves)
+        return best_move[2], best_move[3]
+
+    center = len(board)//2
+    if len(board)%2 == 1:
+        if board[center][center] == "":
+            return center, center
+    else:
+        corners = [(0,0), (0, len(board)-1), (len(board)-1, 0), (len(board)-1, len(board)-1)]
+        for y, x in corners:
+            if board[y][x] == "":
+                return y, x
 
  
 if __name__ == "__main__":
