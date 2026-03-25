@@ -1,15 +1,21 @@
 import sys
 
-from tkinter import *
-from tkinter import ttk
-
 def main():
     in_a_row = 3
-    board = [["","",""],["","",""],["","",""]]
+    board_size = int(input("Size of the board: "))
+    board = []
+
+    for i in range(board_size):
+        board.append([])
+        for _ in range(board_size):
+            board[i].append("")
+
+    if len(board) > 5:
+        in_a_row = len(board) - 3
+
     while True:
 
-        for row in board:
-            print(f"|{row[0]}|{row[1]}|{row[2]}|")
+        print_board(board)
 
         y_input = int(input("Place X at row: ")) -1
         x_input = int(input("Place X at column: ")) -1
@@ -20,8 +26,7 @@ def main():
             continue
 
         if check_victory(board, in_a_row):
-            for row in board:
-                print(f"|{row[0]}|{row[1]}|{row[2]}|")
+            print_board(board)
 
             print("Victory royal!")
             return
@@ -30,14 +35,16 @@ def main():
         board[enemy_y][enemy_x] = "O"
 
         if check_victory(board, in_a_row):
-            for row in board:
-                print(f"|{row[0]}|{row[1]}|{row[2]}|")
+            print_board(board)
 
             print("Looser!")
             return
 
 
-#Change victory cond check to be viable in bigger scale boards
+def print_board(board):
+    for row in board:
+        print("| " + " | ".join(row) + " |")
+
 def check_victory(board, in_a_row):
 
     directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
@@ -78,6 +85,12 @@ def enemy_function(board, in_a_row):
                             empty_square_index = segment.index("")
                             return y + empty_square_index*dy, x + empty_square_index*dx
                         elif segment.count(symbol) > 1 and segment.count("") > 0 and len(set(segment)) == 2:
+                            symbol_value = 0
+                            if symbol == "O":
+                                symbol_value = 1
+                            empty_square_index = segment.index("")
+                            best_moves.append((segment.count(symbol), symbol_value, y + empty_square_index*dy, x + empty_square_index*dx))
+                        elif segment.count("O") > 0 and segment.count("") > 0 and len(set(segment)) == 2:
                             symbol_value = 0
                             if symbol == "O":
                                 symbol_value = 1
